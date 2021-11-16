@@ -53,7 +53,7 @@ export class BarChartComponent implements OnInit {
     this.createChart()
   }
 
-  createChart(){
+  createChart(): void {
 
     // Cria o SVG e adiciona um atributo para visualização
     const svg = d3.select("#bar-chart")
@@ -79,29 +79,43 @@ export class BarChartComponent implements OnInit {
                               .text("↑ Frequency")
 
     let yAxis = (g: any) => g.attr("transform", `translate(${this.margin.left},0)`)
-                             .call(d3.axisLeft(y).ticks(null, "%"))
-                             .call((g: any) => g.select(".domain").remove())
+                            .call(d3.axisLeft(y).ticks(null, "%"))
+                            .call((g: any) => g.select(".domain").remove())
 
     let xAxis = (g: any) => g.attr("transform", `translate(0,${this.height - this.margin.bottom})`)
-                             .call(d3.axisBottom(x).tickSizeOuter(0))
+                            .call(d3.axisBottom(x).tickSizeOuter(0))
 
     svg.append("g")
-       .attr("fill", "steelblue")
-       .selectAll("rect")
-       .data(this.data)
-       .join("rect")
-       .attr("x", (d: any) => <any>x(d.letter))
-       .attr("y", d => y(d.frequency))
-       .attr("height", d => y(0) - y(d.frequency))
-       .transition()
-       .duration(2000)
-       .attr("width", x.bandwidth());
+      .attr("fill", "steelblue")
+      .selectAll("rect")
+      .data(this.data)
+      .join("rect")
+      .on('mouseenter', function(d: any) {
+        d3.select(this)
+        .style('opacity', 0.5)
+        .transition()
+        .duration(200)
+      })
+      .on('mouseleave', function(d: any) {
+        d3.select(this)
+        .style('opacity', 1)
+        .transition()
+        .duration(200)
+      })
+      .attr("x", (d: any) => <any>x(d.letter))
+      .attr("y", d => y(d.frequency))
+      .attr("height", d => y(0) - y(d.frequency))
+      .transition()
+      .duration(2000)
+      .attr("width", x.bandwidth())
+      //capturar evento de click
+      
 
     svg.append("g")
-       .call(xAxis);
+      .call(xAxis);
 
     svg.append("g")
-       .call(yAxis);
+      .call(yAxis);
 
     svg.call(yTitle);
   }
